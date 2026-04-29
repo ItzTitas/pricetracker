@@ -9,31 +9,45 @@ CORS(app)
 TROY_OUNCE_TO_GRAM = 31.1034768
 POUND_TO_GRAM = 453.592
 
-def get_historical_data(ticker, period="40d", interval="1d"):
-    t = yf.Ticker(ticker)
-    df = t.history(period=period, interval=interval)
-    if df.empty:
-        return []
-    prices = df['Close'].dropna().tolist()
-    return prices
-
 @app.route('/api/commodities', methods=['GET'])
 def get_commodities():
     try:
-        # Fetch data
-        gold_raw = get_historical_data("GC=F", "40d", "1d")[-30:]
-        gold_raw_1d = get_historical_data("GC=F", "1d", "15m")
-        silver_raw = get_historical_data("SI=F", "40d", "1d")[-30:]
-        silver_raw_1d = get_historical_data("SI=F", "1d", "15m")
-        copper_raw = get_historical_data("HG=F", "40d", "1d")[-30:]
-        copper_raw_1d = get_historical_data("HG=F", "1d", "15m")
-        usd_inr_raw = get_historical_data("INR=X", "40d", "1d")[-30:]
+        # Tickers for commodities and exchange rate
+        tickers = ["GC=F", "SI=F", "HG=F", "INR=X"]
+        
+        # Download historical data in one batch to stay within Vercel's timeout
+        # We fetch 40d to ensure we have enough data points
+        data_30d = yf.download(tickers, period="40d", interval="1d", group_by='ticker', progress=False)
+        
+        # Download intraday data in one batch
+        data_1d = yf.download(tickers, period="1d", interval="15m", group_by='ticker', progress=False)
+        
+        def get_series(df, ticker):
+            try:
+                if df.empty:
+                    return []
+                # Use group_by='ticker' format: df[ticker]['Close']
+                return df[ticker]['Close'].dropna().tolist()
+            except:
+                return []
+
+        gold_raw = get_series(data_30d, "GC=F")[-30:]
+        gold_raw_1d = get_series(data_1d, "GC=F")
+        
+        silver_raw = get_series(data_30d, "SI=F")[-30:]
+        silver_raw_1d = get_series(data_1d, "SI=F")
+        
+        copper_raw = get_series(data_30d, "HG=F")[-30:]
+        copper_raw_1d = get_series(data_1d, "HG=F")
+        
+        usd_inr_raw = get_series(data_30d, "INR=X")
         
         # Current exchange rate
         exchange_rate = usd_inr_raw[-1] if usd_inr_raw else 83.5
         
-        # Convert prices to USD per gram
-        def convert(arr, divisor): return [float(p / divisor) for p in arr]
+        # Helper to convert array
+        def convert(arr, divisor):
+            return [float(p / divisor) for p in arr] if arr else []
 
         gold_history = convert(gold_raw, TROY_OUNCE_TO_GRAM)
         gold_history_1d = convert(gold_raw_1d, TROY_OUNCE_TO_GRAM)
@@ -66,10 +80,7 @@ def get_commodities():
             }
         })
     except Exception as e:
-        print("Error fetching data:", e)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    print("Starting Commodity Price API Server...")
-    print("API Endpoint: http://127.0.0.1:5000/api/commodities")
     app.run(port=5000, host="0.0.0.0")
