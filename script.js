@@ -60,7 +60,7 @@ const elements = {
 // Fetch from Local API
 async function fetchCommodityData() {
     try {
-        const response = await fetch('http://127.0.0.1:5000/api/commodities');
+        const response = await fetch('/api/commodities');
         if (!response.ok) throw new Error('Network response was not ok');
         const apiData = await response.json();
         
