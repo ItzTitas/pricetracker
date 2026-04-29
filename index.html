@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>price tracker</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="sticky-header">
+        <div class="header-content">
+            <h1>📈 price tracker</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="filters-bar">
+            <div class="control-group">
+                <div class="custom-select" id="location-select" data-id="location">
+                    <div class="select-selected">Kolkata, IN</div>
+                    <div class="select-items select-hide">
+                        <div class="search-container">
+                            <input type="text" class="select-search" placeholder="Search places...">
+                        </div>
+                        <div data-value="Kolkata" class="same-as-selected">Kolkata, IN</div>
+                        <div data-value="Mumbai">Mumbai, IN</div>
+                        <div data-value="Delhi">Delhi, IN</div>
+                        <div data-value="NewYork">New York, US</div>
+                        <div data-value="London">London, UK</div>
+                        <div data-value="Dubai">Dubai, UAE</div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="custom-select" id="currency-select" data-id="currency">
+                    <div class="select-selected">₹ INR</div>
+                    <div class="select-items select-hide">
+                        <div data-value="INR" class="same-as-selected">₹ INR</div>
+                        <div data-value="USD">$ USD</div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="custom-select" id="weight-select" data-id="weight">
+                    <div class="select-selected">10 Grams</div>
+                    <div class="select-items select-hide">
+                        <div data-value="1g">1 Gram</div>
+                        <div data-value="10g" class="same-as-selected">10 Grams</div>
+                        <div data-value="1kg">1 Kilogram</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gold Card -->
+        <article class="commodity-card" id="gold-card" data-commodity="gold">
+            <div class="card-header">
+                <h2>Gold</h2>
+                <div class="purity-selector custom-select-wrapper">
+                    <div class="custom-select" id="gold-purity-select" data-id="goldPurity">
+                        <div class="select-selected">24K (99.9%)</div>
+                        <div class="select-items select-hide">
+                            <div data-value="24K" class="same-as-selected">24K (99.9%)</div>
+                            <div data-value="22K">22K (91.6%)</div>
+                            <div data-value="20K">20K (83.3%)</div>
+                            <div data-value="18K">18K (75.0%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="price-display">
+                <div class="main-price">
+                    <span class="currency-symbol">₹</span><span class="price-value" id="gold-price-main">--</span>
+                    <span class="unit" id="gold-unit-main">/ 10g</span>
+                </div>
+                <div class="trend" id="gold-trend">
+                    <span class="trend-icon">--</span> <span class="trend-value">--%</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="expand-btn">Tap for 7-Day Trend</button>
+            </div>
+            <div class="chart-container" id="gold-chart-container">
+                <div class="chart-controls">
+                    <button class="time-btn" data-time="1d">1D</button>
+                    <button class="time-btn active" data-time="7d">7D</button>
+                    <button class="time-btn" data-time="14d">2W</button>
+                    <button class="time-btn" data-time="30d">30D</button>
+                </div>
+                <canvas id="goldChart"></canvas>
+            </div>
+        </article>
+
+        <!-- Silver Card -->
+        <article class="commodity-card" id="silver-card" data-commodity="silver">
+            <div class="card-header">
+                <h2>Silver</h2>
+            </div>
+            <div class="price-display">
+                <div class="main-price">
+                    <span class="currency-symbol">₹</span><span class="price-value" id="silver-price-main">--</span>
+                    <span class="unit" id="silver-unit-main">/ 10g</span>
+                </div>
+                <div class="trend" id="silver-trend">
+                    <span class="trend-icon">--</span> <span class="trend-value">--%</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="expand-btn">Tap for 7-Day Trend</button>
+            </div>
+            <div class="chart-container" id="silver-chart-container">
+                <div class="chart-controls">
+                    <button class="time-btn" data-time="1d">1D</button>
+                    <button class="time-btn active" data-time="7d">7D</button>
+                    <button class="time-btn" data-time="14d">2W</button>
+                    <button class="time-btn" data-time="30d">30D</button>
+                </div>
+                <canvas id="silverChart"></canvas>
+            </div>
+        </article>
+
+        <!-- Copper Card -->
+        <article class="commodity-card" id="copper-card" data-commodity="copper">
+            <div class="card-header">
+                <h2>Copper</h2>
+            </div>
+            <div class="price-display">
+                <div class="main-price">
+                    <span class="currency-symbol">₹</span><span class="price-value" id="copper-price-main">--</span>
+                    <span class="unit" id="copper-unit-main">/ 10g</span>
+                </div>
+                <div class="trend" id="copper-trend">
+                    <span class="trend-icon">--</span> <span class="trend-value">--%</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="expand-btn">Tap for 7-Day Trend</button>
+            </div>
+            <div class="chart-container" id="copper-chart-container">
+                <div class="chart-controls">
+                    <button class="time-btn" data-time="1d">1D</button>
+                    <button class="time-btn active" data-time="7d">7D</button>
+                    <button class="time-btn" data-time="14d">2W</button>
+                    <button class="time-btn" data-time="30d">30D</button>
+                </div>
+                <canvas id="copperChart"></canvas>
+            </div>
+        </article>
+
+        <div class="status-bar">
+            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <span class="last-updated">Last Updated: <span id="timestamp">--</span></span>
+                <span class="api-status" id="api-status">Using Live Market Data</span>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button id="notify-toggle" class="theme-toggle" aria-label="Toggle Notifications" title="Notify me on 7-day low">
+                    <svg id="notify-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                </button>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode">
+                    <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
