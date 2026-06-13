@@ -36,25 +36,42 @@ export default function AurumCalculatorDashboard() {
   const { data: session, status } = useSession();
   const isAuthenticated = status === 'authenticated';
 
+  // Theme state (defaults to light mode)
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    // Check localStorage on mount
+    const savedTheme = localStorage.getItem('aurumtrack_theme') as 'light' | 'dark';
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('aurumtrack_theme', theme);
+  }, [theme]);
+
   // Global filters (persisted to localStorage)
-  const [location, setLocation] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('aurumtrack_location') || 'Kolkata';
-    }
-    return 'Kolkata';
-  });
-  const [currency, setCurrency] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('aurumtrack_currency') || 'INR';
-    }
-    return 'INR';
-  });
-  const [weight, setWeight] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('aurumtrack_weight') || '10g';
-    }
-    return '10g';
-  });
+  const [location, setLocation] = useState('Kolkata');
+  const [currency, setCurrency] = useState('INR');
+  const [weight, setWeight] = useState('10g');
+
+  useEffect(() => {
+    const savedLocation = localStorage.getItem('aurumtrack_location');
+    if (savedLocation) setLocation(savedLocation);
+    
+    const savedCurrency = localStorage.getItem('aurumtrack_currency');
+    if (savedCurrency) setCurrency(savedCurrency);
+    
+    const savedWeight = localStorage.getItem('aurumtrack_weight');
+    if (savedWeight) setWeight(savedWeight);
+  }, []);
 
   // Live feeds
   const [livePrices, setLivePrices] = useState<any>(null);
@@ -736,7 +753,7 @@ export default function AurumCalculatorDashboard() {
             
             {/* Hero CTA */}
             <div className="text-center max-w-3xl mx-auto space-y-6 py-10 flex flex-col items-center">
-              <Logo large={true} iconSize={72} textSize="text-3xl sm:text-6xl md:text-7xl" className="flex justify-center mb-2 animate-scaleUp" />
+              <Logo large={true} iconSize={72} textSize="text-3xl sm:text-6xl md:text-7xl" className="flex justify-center mb-2 animate-scaleUp" useAltLogo={true} />
               <p className="text-zinc-600 text-sm sm:text-base max-w-xl mx-auto">
                 Stop managing physical precious metals in spreadsheets. Track inherited jewelry, record legacy bullion, and monitor growth against live spot rates on <span className="font-bold text-amber-500">aurumcalculator</span>.
               </p>
@@ -882,7 +899,7 @@ export default function AurumCalculatorDashboard() {
                 <div className="bg-white border border-zinc-200/80 text-zinc-900 rounded-[28px] p-6 shadow-sm relative overflow-hidden transition-all duration-350">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-xl font-black tracking-tight text-zinc-900">Gold</h3>
+                      <h3 className="text-xl font-black tracking-tight text-zinc-900">Gold (Au)</h3>
                       <div className={`flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border ${
                           goldPctChange === null ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' :
                           goldPctChange >= 0 ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' :
@@ -989,7 +1006,7 @@ export default function AurumCalculatorDashboard() {
                 <div className="bg-white border border-zinc-200/80 text-zinc-900 rounded-[28px] p-6 shadow-sm relative overflow-hidden transition-all duration-350">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-xl font-black tracking-tight text-zinc-900">Silver</h3>
+                      <h3 className="text-xl font-black tracking-tight text-zinc-900">Silver (Ag)</h3>
                       <div className={`flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border ${
                           silverPctChange === null ? 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20' :
                           silverPctChange >= 0 ? 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20' :
@@ -1157,7 +1174,7 @@ export default function AurumCalculatorDashboard() {
                     <div className="bg-white border border-zinc-200 text-zinc-900 rounded-[28px] p-6 shadow-sm relative overflow-hidden transition-all duration-350">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-xl font-black tracking-tight text-zinc-900">Gold</h3>
+                          <h3 className="text-xl font-black tracking-tight text-zinc-900">Gold (Au)</h3>
                           <div className={`flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border ${
                                 goldPctChange === null ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' :
                                 goldPctChange >= 0 ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' :
@@ -1253,7 +1270,7 @@ export default function AurumCalculatorDashboard() {
                     <div className="bg-white border border-zinc-200 text-zinc-900 rounded-[28px] p-6 shadow-sm relative overflow-hidden transition-all duration-350">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-xl font-black tracking-tight text-zinc-900">Silver</h3>
+                          <h3 className="text-xl font-black tracking-tight text-zinc-900">Silver (Ag)</h3>
                           <div className={`flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border ${
                                 silverPctChange === null ? 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20' :
                                 silverPctChange >= 0 ? 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20' :
@@ -1729,6 +1746,20 @@ export default function AurumCalculatorDashboard() {
                             )}
                           </div>
                         </div>
+                      </div>
+                    </div>
+                    {/* Appearance Preference Toggle */}
+                    <div className="space-y-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-150 dark:border-zinc-800 rounded-2xl p-4 shadow-sm">
+                      <h4 className="text-xs font-black text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Appearance</h4>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-zinc-550 dark:text-zinc-400 font-semibold">Enable dark mode for the application</span>
+                        <button
+                          type="button"
+                          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                          className="bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-1.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+                        >
+                          {theme === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -2271,6 +2302,20 @@ export default function AurumCalculatorDashboard() {
                     )}
                   </div>
                 </div>
+              </div>
+            </div>
+            {/* Appearance Preference Toggle in Popup */}
+            <div className="space-y-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-150 dark:border-zinc-800 rounded-2xl p-4 shadow-sm">
+              <h4 className="text-xs font-black text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Appearance</h4>
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] text-zinc-550 dark:text-zinc-400 font-semibold">Enable dark mode for the application</span>
+                <button
+                  type="button"
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className="bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-1.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+                >
+                  {theme === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                </button>
               </div>
             </div>
 

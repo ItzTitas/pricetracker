@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -23,4 +25,128 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Premium Dark Mode Styling Overrides */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #09090b !important; /* zinc-950 */
+  color: #fafafa !important; /* zinc-50 */
+}
+
+/* Cards, boxes, panels */
+html.dark .bg-white {
+  background-color: #18181b !important; /* zinc-900 */
+}
+
+html.dark .bg-zinc-50 {
+  background-color: #09090b !important;
+}
+
+html.dark .bg-zinc-50\/50 {
+  background-color: rgba(24, 24, 27, 0.5) !important;
+}
+
+html.dark .bg-zinc-50\/80 {
+  background-color: rgba(9, 9, 11, 0.8) !important;
+}
+
+html.dark .bg-zinc-100 {
+  background-color: #27272a !important; /* zinc-800 */
+}
+
+html.dark .bg-zinc-150 {
+  background-color: #27272a !important;
+}
+
+html.dark .bg-zinc-200 {
+  background-color: #27272a !important;
+}
+
+html.dark .bg-zinc-200\/50 {
+  background-color: rgba(39, 39, 42, 0.5) !important;
+}
+
+html.dark .hover\:bg-zinc-50:hover {
+  background-color: #27272a !important;
+}
+
+html.dark .hover\:bg-zinc-100:hover {
+  background-color: #27272a !important;
+}
+
+html.dark .hover\:bg-zinc-200:hover {
+  background-color: #3f3f46 !important;
+}
+
+/* Borders */
+html.dark .border,
+html.dark .border-zinc-200,
+html.dark .border-zinc-200\/80,
+html.dark .border-zinc-150,
+html.dark .border-zinc-100 {
+  border-color: #27272a !important; /* zinc-800 */
+}
+
+html.dark .border-zinc-250,
+html.dark .border-zinc-255 {
+  border-color: #3f3f46 !important;
+}
+
+/* Text colors */
+html.dark .text-zinc-950,
+html.dark .text-zinc-900,
+html.dark .text-zinc-800,
+html.dark .text-zinc-700 {
+  color: #f4f4f5 !important; /* zinc-100 */
+}
+
+html.dark .text-zinc-600,
+html.dark .text-zinc-500,
+html.dark .text-zinc-550,
+html.dark .text-zinc-455 {
+  color: #a1a1aa !important; /* zinc-400 */
+}
+
+/* Inputs and Forms */
+html.dark input,
+html.dark select {
+  background-color: #27272a !important;
+  color: #fafafa !important;
+  border-color: #3f3f46 !important;
+}
+
+html.dark input::placeholder {
+  color: #71717a !important;
+}
+
+/* Primary/Dark Buttons */
+html.dark .bg-zinc-950.text-white,
+html.dark .bg-zinc-900.text-white,
+html.dark .bg-zinc-950,
+html.dark .bg-zinc-900 {
+  background-color: #fafafa !important;
+  color: #18181b !important;
+}
+
+html.dark .bg-zinc-950:hover,
+html.dark .bg-zinc-900:hover {
+  background-color: #f4f4f5 !important;
+}
+
+html.dark .text-white {
+  color: #fafafa !important;
+}
+
+/* Recharts Tooltip styling override in dark mode */
+html.dark .recharts-default-tooltip {
+  background-color: #18181b !important;
+  border-color: #27272a !important;
+  color: #fafafa !important;
+}
+
+

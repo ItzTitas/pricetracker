@@ -6,14 +6,16 @@ interface LogoProps {
   iconSize?: number;
   textSize?: string;
   large?: boolean;
+  useAltLogo?: boolean;
 }
 
-export default function Logo({ className = '', iconSize = 28, textSize = 'text-2xl', large = false }: LogoProps) {
+export default function Logo({ className = '', iconSize = 28, textSize = 'text-2xl', large = false, useAltLogo = true }: LogoProps) {
+  const logoSrc = useAltLogo ? "/websitecomplemented.png" : "/applogo.jpg";
   return (
     <div className={`select-none flex items-center gap-2 sm:gap-3 ${className}`}>
       {/* Logo mark */}
       <Image
-        src="/applogo.jpg"
+        src={logoSrc}
         alt="aurumcalculator logo"
         width={iconSize}
         height={iconSize}
@@ -26,7 +28,7 @@ export default function Logo({ className = '', iconSize = 28, textSize = 'text-2
           fontFamily: 'Impact, sans-serif',
           letterSpacing: '0.06em'
         }}
-        className={`text-zinc-950 font-normal tracking-wide ${textSize}`}
+        className={`text-zinc-950 dark:text-zinc-50 font-normal tracking-wide transition-colors ${textSize}`}
       >
         aurumcalculator.
       </span>
