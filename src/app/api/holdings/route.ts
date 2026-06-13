@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { prisma, querySql, executeSql } from '@/lib/db';
-import { getServerSession } from 'next-auth';
 
 const pgUrl = process.env.DATABASE_URL;
 const isPostgres = !!pgUrl;
@@ -10,7 +11,7 @@ const demoUserId = 'demo-user-id';
 // GET all holdings
 export async function GET() {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     const userId = (session?.user as any)?.id || demoUserId;
 
     let holdings: any[] = [];
@@ -69,7 +70,7 @@ export async function GET() {
 // POST new holding
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     const userId = (session?.user as any)?.id || demoUserId;
     const body = await request.json();
 

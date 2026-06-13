@@ -12,7 +12,7 @@ export default function Logo({ className = '', iconSize = 28, textSize = 'text-2
     <div className={`select-none flex items-center gap-2.5 ${className}`}>
       {/* Logo mark */}
       <Image
-        src="/logo.png"
+        src="/applogo.jpg"
         alt="aurumtracker logo"
         width={iconSize}
         height={iconSize}

@@ -17,21 +17,21 @@ export const metadata: Metadata = {
   description: "Real-time commodities intelligence for Gold and Silver price tracking, investment return calculation, regional comparison, and advanced charting.",
   icons: {
     icon: [
-      { url: '/logo.png', type: 'image/png' },
+      { url: '/applogo.jpg', type: 'image/jpeg' },
     ],
     apple: [
-      { url: '/apple-touch-icon.png', type: 'image/png' },
+      { url: '/applogo.jpg', type: 'image/jpeg' },
     ],
-    shortcut: '/logo.png',
+    shortcut: '/applogo.jpg',
   },
   openGraph: {
     title: "aurumtracker.",
     description: "Real-time Gold & Silver portfolio intelligence.",
-    images: [{ url: '/logo.png' }],
+    images: [{ url: '/applogo.jpg' }],
   },
   twitter: {
     card: 'summary',
-    images: ['/logo.png'],
+    images: ['/applogo.jpg'],
   },
   manifest: '/manifest.json',
 };
@@ -49,8 +49,8 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <link rel="icon" href="/logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/applogo.jpg" type="image/jpeg" />
+        <link rel="apple-touch-icon" href="/applogo.jpg" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#fbbf24" />
       </head>

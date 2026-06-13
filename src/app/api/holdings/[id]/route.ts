@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { prisma, executeSql } from '@/lib/db';
-import { getServerSession } from 'next-auth';
 
 const pgUrl = process.env.DATABASE_URL;
 const isPostgres = !!pgUrl;
@@ -10,7 +11,7 @@ const demoUserId = 'demo-user-id';
 // PUT update holding
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     const userId = (session?.user as any)?.id || demoUserId;
     const body = await request.json();
     const { id } = await params;
@@ -83,7 +84,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 // DELETE holding
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     const userId = (session?.user as any)?.id || demoUserId;
     const { id } = await params;
 

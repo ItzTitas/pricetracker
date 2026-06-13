@@ -36,10 +36,25 @@ export default function AurumTrackDashboard() {
   const { data: session, status } = useSession();
   const isAuthenticated = status === 'authenticated';
 
-  // Global filters
-  const [location, setLocation] = useState('Kolkata');
-  const [currency, setCurrency] = useState('INR');
-  const [weight, setWeight] = useState('10g');
+  // Global filters (persisted to localStorage)
+  const [location, setLocation] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('aurumtrack_location') || 'Kolkata';
+    }
+    return 'Kolkata';
+  });
+  const [currency, setCurrency] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('aurumtrack_currency') || 'INR';
+    }
+    return 'INR';
+  });
+  const [weight, setWeight] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('aurumtrack_weight') || '10g';
+    }
+    return '10g';
+  });
 
   // Live feeds
   const [livePrices, setLivePrices] = useState<any>(null);
@@ -55,7 +70,7 @@ export default function AurumTrackDashboard() {
   const [itemPurity, setItemPurity] = useState('24K');
   const [itemWeight, setItemWeight] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState('2024-01-01');
+  const [purchaseDate, setPurchaseDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [purchaseCity, setPurchaseCity] = useState('Kolkata');
   const [isJewelry, setIsJewelry] = useState(false);
   const [jewelryType, setJewelryType] = useState('Necklace');
@@ -146,6 +161,17 @@ export default function AurumTrackDashboard() {
       .then(data => setHasGoogleClient(data.configured))
       .catch(() => setHasGoogleClient(false));
   }, []);
+
+  // Persist global filter choices to localStorage
+  useEffect(() => {
+    localStorage.setItem('aurumtrack_location', location);
+  }, [location]);
+  useEffect(() => {
+    localStorage.setItem('aurumtrack_currency', currency);
+  }, [currency]);
+  useEffect(() => {
+    localStorage.setItem('aurumtrack_weight', weight);
+  }, [weight]);
 
   useEffect(() => {
     const saved = localStorage.getItem('weeklyNotify');
@@ -298,15 +324,13 @@ export default function AurumTrackDashboard() {
   useEffect(() => {
     const fetchOverviewCharts = async () => {
       try {
-        let tfGold = '7D';
-        if (goldChartTimeframe === '1D') tfGold = '1D';
-        if (goldChartTimeframe === '2W') tfGold = '7D';
-        if (goldChartTimeframe === '30D') tfGold = '1M';
-
-        let tfSilver = '7D';
-        if (silverChartTimeframe === '1D') tfSilver = '1D';
-        if (silverChartTimeframe === '2W') tfSilver = '7D';
-        if (silverChartTimeframe === '30D') tfSilver = '1M';
+        // Map display label to API timeframe key
+        const TF_MAP: Record<string, string> = {
+          '1D': '1D', '7D': '7D', '2W': '7D', '30D': '1M',
+          '3M': '3M', '6M': '6M', '1Y': '1Y', '5Y': '5Y', 'MAX': 'MAX'
+        };
+        const tfGold = TF_MAP[goldChartTimeframe] || '7D';
+        const tfSilver = TF_MAP[silverChartTimeframe] || '7D';
 
         // Fetch Gold
         const goldParams = new URLSearchParams({
@@ -351,6 +375,18 @@ export default function AurumTrackDashboard() {
         setRecommendedPrice(null);
         return;
       }
+
+      // If date is today, derive price from already-adjusted live price (per gram, INR, location-baked-in)
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (purchaseDate === todayStr && livePrices) {
+        const pricePerGram = metalType === 'gold'
+          ? livePrices.gold.current * (PURITY_MULTIPLIERS[itemPurity] || 1.0)
+          : livePrices.silver.current;
+        setRecommendedPrice(pricePerGram);
+        return;
+      }
+
+      // For historical dates: hit the historical API — returns price per gram in correct city/currency
       try {
         const params = new URLSearchParams({
           metal: metalType,
@@ -371,7 +407,7 @@ export default function AurumTrackDashboard() {
       }
     };
     fetchRecommendedPrice();
-  }, [metalType, itemPurity, purchaseDate, purchaseCity, currency]);
+  }, [metalType, itemPurity, purchaseDate, purchaseCity, currency, livePrices]);
 
   useEffect(() => {
     const ticker = setInterval(() => setTickerTime(t => t + 1), 1000);
@@ -526,6 +562,17 @@ export default function AurumTrackDashboard() {
   const weightMult = getWeightMult();
   const currSymbol = currency === 'INR' ? '₹' : '$';
 
+  // Dynamic % change computed from chart data first → last point
+  const calcPct = (data: { price: number }[]) => {
+    if (data.length < 2) return null;
+    const first = data[0].price;
+    const last = data[data.length - 1].price;
+    if (!first) return null;
+    return ((last - first) / first) * 100;
+  };
+  const goldPctChange = calcPct(goldChartData);
+  const silverPctChange = calcPct(silverChartData);
+
   const formatPrice = (val: number) => {
     return val.toLocaleString(currency === 'INR' ? 'en-IN' : 'en-US', {
       minimumFractionDigits: 2,
@@ -675,16 +722,7 @@ export default function AurumTrackDashboard() {
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-950 flex flex-col font-sans selection:bg-amber-500 selection:text-zinc-950">
       
-      {/* Top Banner Navigation */}
-      <header className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-zinc-50/80 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.015)] border-none' 
-          : 'bg-transparent border-none'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-center">
-          <Logo iconSize={26} textSize="text-xl" />
-        </div>
-      </header>
+
 
       {/* Main Content Layout */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-8">
@@ -715,9 +753,9 @@ export default function AurumTrackDashboard() {
                         });
                       }
                     }}
-                    className="bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 font-extrabold text-sm px-5 py-2.5 rounded-full shadow-sm transition-all cursor-pointer flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                    className="bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 font-extrabold text-lg px-10 py-[18px] rounded-full shadow-md transition-all cursor-pointer flex items-center gap-3.5 hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                       <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
@@ -725,12 +763,8 @@ export default function AurumTrackDashboard() {
                     </svg>
                     Sign in with Google
                   </button>
-                  <button
-                    onClick={() => signIn('credentials', { email: 'titas@aurumtrack.com', callbackUrl: '/' })}
-                    className="bg-zinc-950 hover:bg-zinc-900 text-white font-extrabold text-sm px-6 py-2.5 rounded-full shadow-md transition-all cursor-pointer flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    Demo Access
-                  </button>
+
+
                 </div>
 
                 <div className="flex items-center justify-center gap-3 mt-2">
@@ -860,8 +894,12 @@ export default function AurumTrackDashboard() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-xl font-black tracking-tight text-zinc-900">Gold</h3>
-                      <div className="flex items-center gap-1.5 mt-2 bg-amber-500/10 text-amber-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border border-amber-500/20">
-                        <span>↑ 3.05%</span>
+                      <div className={`flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border ${
+                          goldPctChange === null ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' :
+                          goldPctChange >= 0 ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' :
+                          'bg-rose-500/10 text-rose-700 border-rose-500/20'
+                        }`}>
+                        <span>{goldPctChange === null ? '—' : `${goldPctChange >= 0 ? '↑' : '↓'} ${Math.abs(goldPctChange).toFixed(2)}%`}</span>
                       </div>
                     </div>
 
@@ -919,7 +957,7 @@ export default function AurumTrackDashboard() {
                   {expandedMetal === 'gold' && (
                     <div className="mt-6 space-y-4 animate-fadeIn">
                       <div className="flex justify-center gap-1">
-                        {['1D', '7D', '2W', '30D'].map(tf => (
+                        {['1D', '7D', '2W', '30D', '3M', '6M', '1Y', '5Y', 'MAX'].map(tf => (
                           <button
                             key={tf}
                             onClick={() => setGoldChartTimeframe(tf)}
@@ -963,8 +1001,12 @@ export default function AurumTrackDashboard() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-xl font-black tracking-tight text-zinc-900">Silver</h3>
-                      <div className="flex items-center gap-1.5 mt-2 bg-zinc-500/10 text-zinc-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border border-zinc-500/20">
-                        <span>↑ 6.22%</span>
+                      <div className={`flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border ${
+                          silverPctChange === null ? 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20' :
+                          silverPctChange >= 0 ? 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20' :
+                          'bg-rose-500/10 text-rose-700 border-rose-500/20'
+                        }`}>
+                        <span>{silverPctChange === null ? '—' : `${silverPctChange >= 0 ? '↑' : '↓'} ${Math.abs(silverPctChange).toFixed(2)}%`}</span>
                       </div>
                     </div>
                   </div>
@@ -988,7 +1030,7 @@ export default function AurumTrackDashboard() {
                   {expandedMetal === 'silver' && (
                     <div className="mt-6 space-y-4 animate-fadeIn">
                       <div className="flex justify-center gap-1">
-                        {['1D', '7D', '2W', '30D'].map(tf => (
+                        {['1D', '7D', '2W', '30D', '3M', '6M', '1Y', '5Y', 'MAX'].map(tf => (
                           <button
                             key={tf}
                             onClick={() => setSilverChartTimeframe(tf)}
@@ -1043,19 +1085,32 @@ export default function AurumTrackDashboard() {
         {isAuthenticated && (
           <div className="space-y-6">
             
-            {/* Dashboard Navigation Tabs */}
-            <div className="flex gap-2 bg-zinc-200/50 p-1.5 rounded-full w-fit max-w-full overflow-hidden mx-auto">
-              {['overview', 'holdings', 'profile'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer uppercase tracking-wider ${
-                    activeTab === tab ? 'bg-white text-zinc-950 shadow-sm' : 'text-zinc-650 hover:text-zinc-900'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+            {/* Sticky header — logo only, centered */}
+            <div className={`sticky top-0 z-50 -mx-4 px-4 py-3 transition-all duration-300 ${
+              isScrolled
+                ? 'bg-zinc-50/80 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
+                : 'bg-transparent'
+            }`}>
+              <div className="flex justify-center">
+                <Logo iconSize={36} textSize="text-2xl" />
+              </div>
+            </div>
+
+            {/* Tab nav — part of the page, not the header */}
+            <div className="flex justify-center">
+              <div className="flex gap-2 bg-zinc-200/50 p-1.5 rounded-full">
+                {['overview', 'holdings', 'profile'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer uppercase tracking-wider ${
+                      activeTab === tab ? 'bg-white text-zinc-950 shadow-sm' : 'text-zinc-500 hover:text-zinc-900'
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
 
 
@@ -1114,9 +1169,13 @@ export default function AurumTrackDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="text-xl font-black tracking-tight text-zinc-900">Gold</h3>
-                          <div className="flex items-center gap-1.5 mt-2 bg-amber-500/10 text-amber-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border border-amber-500/20">
-                            <span>↑ 3.05%</span>
-                          </div>
+                          <div className={`flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border ${
+                                goldPctChange === null ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' :
+                                goldPctChange >= 0 ? 'bg-amber-500/10 text-amber-700 border-amber-500/20' :
+                                'bg-rose-500/10 text-rose-700 border-rose-500/20'
+                              }`}>
+                              <span>{goldPctChange === null ? '—' : `${goldPctChange >= 0 ? '↑' : '↓'} ${Math.abs(goldPctChange).toFixed(2)}%`}</span>
+                            </div>
                         </div>
 
                         {/* Custom Purity Selector */}
@@ -1163,7 +1222,7 @@ export default function AurumTrackDashboard() {
                       {/* Always visible Trend Options & Chart */}
                       <div className="mt-6 border-t border-zinc-100 pt-4 space-y-4">
                         <div className="flex justify-center gap-1">
-                          {['1D', '7D', '2W', '30D'].map(tf => (
+                          {['1D', '7D', '2W', '30D', '3M', '6M', '1Y', '5Y', 'MAX'].map(tf => (
                             <button
                               key={tf}
                               onClick={() => setGoldChartTimeframe(tf)}
@@ -1206,9 +1265,13 @@ export default function AurumTrackDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="text-xl font-black tracking-tight text-zinc-900">Silver</h3>
-                          <div className="flex items-center gap-1.5 mt-2 bg-zinc-500/10 text-zinc-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border border-zinc-500/20">
-                            <span>↑ 6.22%</span>
-                          </div>
+                          <div className={`flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold w-fit border ${
+                                silverPctChange === null ? 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20' :
+                                silverPctChange >= 0 ? 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20' :
+                                'bg-rose-500/10 text-rose-700 border-rose-500/20'
+                              }`}>
+                              <span>{silverPctChange === null ? '—' : `${silverPctChange >= 0 ? '↑' : '↓'} ${Math.abs(silverPctChange).toFixed(2)}%`}</span>
+                            </div>
                         </div>
                       </div>
 
@@ -1221,7 +1284,7 @@ export default function AurumTrackDashboard() {
                       {/* Always visible Trend Options & Chart */}
                       <div className="mt-6 border-t border-zinc-100 pt-4 space-y-4">
                         <div className="flex justify-center gap-1">
-                          {['1D', '7D', '2W', '30D'].map(tf => (
+                          {['1D', '7D', '2W', '30D', '3M', '6M', '1Y', '5Y', 'MAX'].map(tf => (
                             <button
                               key={tf}
                               onClick={() => setSilverChartTimeframe(tf)}
@@ -1398,7 +1461,10 @@ export default function AurumTrackDashboard() {
                   </h3>
                   
                   <button
-                    onClick={() => setShowAddModal(true)}
+                    onClick={() => {
+                      setPurchaseDate(new Date().toISOString().split('T')[0]);
+                      setShowAddModal(true);
+                    }}
                     className="bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-black px-4 py-2 rounded-full cursor-pointer flex items-center gap-1 shadow-sm"
                   >
                     <Plus size={14} />

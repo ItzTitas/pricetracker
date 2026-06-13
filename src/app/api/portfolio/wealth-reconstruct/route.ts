@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma, querySql } from '@/lib/db';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 const pgUrl = process.env.DATABASE_URL;
 const isPostgres = !!pgUrl;
@@ -9,7 +10,7 @@ const demoUserId = 'demo-user-id';
 
 export async function GET() {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     const userId = (session?.user as any)?.id || demoUserId;
 
     // Fetch user holdings
