@@ -741,22 +741,10 @@ export default function AurumCalculatorDashboard() {
                 Stop managing physical precious metals in spreadsheets. Track inherited jewelry, record legacy bullion, and monitor growth against live spot rates on <span className="font-bold text-amber-500">aurumcalculator</span>.
               </p>
               
-              <div className="pt-2 flex flex-col items-center gap-4">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      if (hasGoogleClient) {
-                        signIn('google', { callbackUrl: '/' });
-                      } else {
-                        signIn('credentials', { 
-                          email: 'titasojha13@gmail.com', 
-                          name: 'Titas Ojha', 
-                          image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
-                          callbackUrl: '/' 
-                        });
-                      }
-                    }}
-                    className="bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 font-extrabold text-lg px-10 py-[18px] rounded-full shadow-md transition-all cursor-pointer flex items-center gap-3.5 hover:scale-[1.02] active:scale-[0.98]"
+              <div className="pt-4 flex flex-col items-center gap-4">
+                <button
+                    onClick={() => signIn('google', { callbackUrl: '/' })}
+                    className="bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 font-extrabold text-xl px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer flex items-center gap-4 hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <svg className="w-6 h-6" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -767,8 +755,6 @@ export default function AurumCalculatorDashboard() {
                     Sign in with Google
                   </button>
 
-
-                </div>
 
                 <div className="flex items-center justify-center gap-3 mt-2">
                   {/* Custom Currency Selector */}
