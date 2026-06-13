@@ -323,6 +323,7 @@ export default function AurumCalculatorDashboard() {
 
   useEffect(() => {
     const fetchOverviewCharts = async () => {
+      setLoadingChart(true);
       try {
         // Map display label to API timeframe key
         const TF_MAP: Record<string, string> = {
@@ -360,6 +361,8 @@ export default function AurumCalculatorDashboard() {
         }
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoadingChart(false);
       }
     };
 
