@@ -158,6 +158,13 @@ export async function initDatabase() {
 
 // SQLite helper queries (when PG is not present)
 export async function executeSql(sql: string, params: any[] = []): Promise<void> {
+  if (isPostgres) {
+    // Convert parameter syntax from $1, $2 to $1, $2 since Prisma supports parameterized queries or raw execution
+    // Actually, $queryRawUnsafe / $executeRawUnsafe accepts arguments directly
+    await prisma.$executeRawUnsafe(sql, ...params);
+    return;
+  }
+
   return new Promise<void>((resolve, reject) => {
     const sqlite3 = require('sqlite3');
     const db = new sqlite3.Database(DB_FILE, (err: any) => {
@@ -179,6 +186,12 @@ export async function executeSql(sql: string, params: any[] = []): Promise<void>
 }
 
 export async function querySql<T>(sql: string, params: any[] = []): Promise<T[]> {
+  if (isPostgres) {
+    // Execute via prisma queryRawUnsafe
+    const result = await prisma.$queryRawUnsafe<any[]>(sql, ...params);
+    return result as T[];
+  }
+
   return new Promise<T[]>((resolve, reject) => {
     const sqlite3 = require('sqlite3');
     const db = new sqlite3.Database(DB_FILE, (err: any) => {
@@ -201,3 +214,4 @@ export async function querySql<T>(sql: string, params: any[] = []): Promise<T[]>
 
 // Aliases for compatibility
 export { executeSql as execute, querySql as query };
+
