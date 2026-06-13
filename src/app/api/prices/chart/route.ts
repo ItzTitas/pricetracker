@@ -58,14 +58,14 @@ export async function GET(request: Request) {
     if (metal === 'gold') {
       sql = `
         SELECT price, timestamp FROM price_history
-        WHERE metal = $1 AND purity = $2 AND city = $3 AND currency = $4 AND timestamp >= $5
+        WHERE metal = $1 AND purity = $2 AND city = $3 AND currency = $4 AND timestamp >= CAST($5 AS TIMESTAMPTZ)
         ORDER BY timestamp ASC
       `;
       params = [metal, purity, city, currency, startIsoStr];
     } else {
       sql = `
         SELECT price, timestamp FROM price_history
-        WHERE metal = $1 AND city = $2 AND currency = $3 AND timestamp >= $4
+        WHERE metal = $1 AND city = $2 AND currency = $3 AND timestamp >= CAST($4 AS TIMESTAMPTZ)
         ORDER BY timestamp ASC
       `;
       params = [metal, city, currency, startIsoStr];

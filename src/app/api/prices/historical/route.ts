@@ -30,7 +30,7 @@ export async function GET(request: Request) {
       histSql = `
         SELECT price, timestamp FROM price_history 
         WHERE metal = $1 AND purity = $2 AND city = $3 AND currency = $4 
-        AND (date(timestamp) = date($5) OR timestamp LIKE $6)
+        AND (date(timestamp) = CAST($5 AS DATE) OR timestamp::text LIKE $6)
         ORDER BY timestamp DESC LIMIT 1
       `;
       histParams = [metal, purity || '24K', city, currency, formattedDate, `${formattedDate}%`];
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       histSql = `
         SELECT price, timestamp FROM price_history 
         WHERE metal = $1 AND city = $2 AND currency = $3 
-        AND (date(timestamp) = date($4) OR timestamp LIKE $5)
+        AND (date(timestamp) = CAST($4 AS DATE) OR timestamp::text LIKE $5)
         ORDER BY timestamp DESC LIMIT 1
       `;
       histParams = [metal, city, currency, formattedDate, `${formattedDate}%`];
