@@ -1,0 +1,124 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String      @id @default(uuid())
+  name          String?
+  email         String      @unique
+  password      String?
+  image         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  holdings      Holding[]
+  watchlists    Watchlist[]
+  alerts        Alert[]
+  snapshots     PortfolioSnapshot[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model Holding {
+  id            String         @id @default(uuid())
+  userId        String         @map("user_id")
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metal         String         // "gold" or "silver"
+  purity        String         // "24K", "22K", "20K", "18K", "999"
+  weight        Float          // in grams
+  purchaseDate  DateTime       @map("purchase_date")
+  purchasePrice Float          @map("purchase_price") // price per gram
+  purchaseCity  String         @map("purchase_city")
+  notes         String?
+  isArchived    Boolean        @default(false) @map("is_archived")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  jewelryItems  JewelryItem[]
+
+  @@index([userId, metal])
+  @@map("holdings")
+}
+
+model JewelryItem {
+  id            String      @id @default(uuid())
+  holdingId     String      @map("holding_id")
+  holding       Holding     @relation(fields: [holdingId], references: [id], onDelete: Cascade)
+  itemName      String      @map("item_name") // e.g. "Necklace", "Chain"
+  jewelryType   String      @map("jewelry_type") // "Necklace", "Chain", "Ring", "Bracelet", "Bangle", "Pendant", "Earrings"
+  weight        Float       // item weight in grams
+  purity        String
+  purchasePrice Float?      @map("purchase_price")
+  purchaseDate  DateTime?   @map("purchase_date")
+  notes         String?
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@map("jewelry_items")
+}
+
+model PriceHistory {
+  id          String    @id @default(uuid())
+  metal       String    // "gold", "silver"
+  purity      String?   // "24K", "22K", etc. (null for silver)
+  city        String
+  currency    String    // "INR", "USD"
+  price       Float     // price per gram
+  timestamp   DateTime  @default(now())
+
+  @@index([metal, purity, city, timestamp])
+  @@map("price_history")
+}
+
+model PortfolioSnapshot {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalValue    Float     @map("total_value") // total portfolio value in user's default currency
+  investedValue Float     @map("invested_value") // total invested amount
+  goldValue     Float     @map("gold_value")
+  silverValue   Float     @map("silver_value")
+  timestamp     DateTime  @default(now())
+
+  @@index([userId, timestamp])
+  @@map("portfolio_snapshots")
+}
+
+model Watchlist {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metal     String
+  purity    String?
+  city      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("watchlists")
+}
+
+model Alert {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metal         String
+  purity        String?
+  condition     String   // "ABOVE", "BELOW"
+  targetPrice   Float    @map("target_price")
+  isTriggered   Boolean  @default(false) @map("is_triggered")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("alerts")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // e.g. "CREATE_HOLDING", "DELETE_HOLDING"
+  details   String
+  timestamp DateTime @default(now())
+
+  @@map("audit_logs")
+}

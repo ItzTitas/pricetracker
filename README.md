@@ -1,49 +1,36 @@
-# 📈 price tracker
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A modern, responsive web application for tracking live commodity prices (Gold, Silver, and Copper) with localized metrics, interactive charts, and browser alerts.
+## Getting Started
 
-## 🌟 Features
+First, run the development server:
 
-- **Real-Time Data**: Fetches live market data using Yahoo Finance via a Python Flask backend.
-- **Interactive Charts**: Visualizes historical price trends with selectable timeframes (1D, 7D, 2W, 30D) using Chart.js.
-- **Smart Filtering**:
-  - **Location**: Calculates regional price variations for cities like Kolkata, Mumbai, New York, Dubai, etc.
-  - **Currency**: Instantly toggle between ₹ INR and $ USD.
-  - **Weight & Purity**: Dynamically calculates prices based on weight (1g, 10g, 1kg) and Gold purity (24K, 22K, 20K, 18K).
-- **Price Drop Alerts**: Automatically triggers a browser notification when Gold hits a 7-day low.
-- **Beautiful UI**: Features a clean, minimalist design with a glassmorphism header, responsive pill-shaped dropdowns, and a seamless Dark/Light mode toggle.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## 🛠️ Tech Stack
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+), Chart.js
-- **Backend**: Python, Flask, `yfinance` (for market data)
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 🚀 Getting Started
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-### Prerequisites
-- Python 3.x
-- pip (Python package manager)
+## Learn More
 
-### Installation
+To learn more about Next.js, take a look at the following resources:
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ItzTitas/pricetracker.git
-   cd pricetracker
-   ```
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-2. Install backend dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-3. Run the Flask backend server:
-   ```bash
-   python server.py
-   ```
+## Deploy on Vercel
 
-4. Open the application:
-   - Simply open `index.html` in your favorite web browser, or serve it using a local development server.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## 📱 Mobile Responsive
-The interface is fully optimized for mobile devices, featuring swipeable filter bars and touch-friendly interactive charts.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
