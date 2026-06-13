@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import sqlite3 from 'sqlite3';
 import path from 'path';
+// sqlite3 is loaded dynamically only in non-postgres local fallback to avoid Vercel build dependency issues
 
 const pgUrl = process.env.DATABASE_URL;
 const isPostgres = !!pgUrl;
@@ -34,7 +34,8 @@ export async function initDatabase() {
   } else {
     // Initialize SQLite Tables
     return new Promise<void>((resolve, reject) => {
-      const db = new sqlite3.Database(DB_FILE, (err) => {
+      const sqlite3 = require('sqlite3');
+      const db = new sqlite3.Database(DB_FILE, (err: any) => {
         if (err) return reject(err);
         db.serialize(() => {
           // 1. Users Table
@@ -144,7 +145,7 @@ export async function initDatabase() {
               details TEXT NOT NULL,
               timestamp TEXT DEFAULT CURRENT_TIMESTAMP
             )
-          `, (err) => {
+          `, (err: any) => {
             db.close();
             if (err) return reject(err);
             resolve();
@@ -158,7 +159,8 @@ export async function initDatabase() {
 // SQLite helper queries (when PG is not present)
 export async function executeSql(sql: string, params: any[] = []): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    const db = new sqlite3.Database(DB_FILE, (err) => {
+    const sqlite3 = require('sqlite3');
+    const db = new sqlite3.Database(DB_FILE, (err: any) => {
       if (err) return reject(err);
     });
 
@@ -168,7 +170,7 @@ export async function executeSql(sql: string, params: any[] = []): Promise<void>
       sqliteSql = sql.replace(pgPlaceholderRegex, '?');
     }
 
-    db.run(sqliteSql, params, (err) => {
+    db.run(sqliteSql, params, (err: any) => {
       db.close();
       if (err) return reject(err);
       resolve();
@@ -178,7 +180,8 @@ export async function executeSql(sql: string, params: any[] = []): Promise<void>
 
 export async function querySql<T>(sql: string, params: any[] = []): Promise<T[]> {
   return new Promise<T[]>((resolve, reject) => {
-    const db = new sqlite3.Database(DB_FILE, (err) => {
+    const sqlite3 = require('sqlite3');
+    const db = new sqlite3.Database(DB_FILE, (err: any) => {
       if (err) return reject(err);
     });
 
@@ -188,7 +191,7 @@ export async function querySql<T>(sql: string, params: any[] = []): Promise<T[]>
       sqliteSql = sql.replace(pgPlaceholderRegex, '?');
     }
 
-    db.all(sqliteSql, params, (err, rows) => {
+    db.all(sqliteSql, params, (err: any, rows: any) => {
       db.close();
       if (err) return reject(err);
       resolve(rows as T[]);

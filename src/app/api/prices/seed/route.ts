@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { initDatabase, execute, query } from '@/lib/db';
-import sqlite3 from 'sqlite3';
 import path from 'path';
 
 const CITIES = ['Kolkata', 'Mumbai', 'Delhi', 'Chennai', 'NewYork', 'London', 'Dubai'];
@@ -41,9 +40,10 @@ export async function POST() {
       await execute('DELETE FROM price_history');
     } else {
       const DB_FILE = path.join(process.cwd(), 'aurumtrack.db');
+      const sqlite3 = require('sqlite3');
       const db = new sqlite3.Database(DB_FILE);
       await new Promise<void>((resolve, reject) => {
-        db.run('DELETE FROM price_history', (err) => {
+        db.run('DELETE FROM price_history', (err: any) => {
           db.close();
           if (err) reject(err);
           else resolve();
@@ -102,6 +102,7 @@ export async function POST() {
     } else {
       // SQLite High Performance Seeding via single Transaction
       const DB_FILE = path.join(process.cwd(), 'aurumtrack.db');
+      const sqlite3 = require('sqlite3');
       const db = new sqlite3.Database(DB_FILE);
 
       await new Promise<void>((resolve, reject) => {
@@ -139,7 +140,7 @@ export async function POST() {
           }
 
           stmt.finalize();
-          db.run('COMMIT', (err) => {
+          db.run('COMMIT', (err: any) => {
             db.close();
             if (err) reject(err);
             else resolve();
