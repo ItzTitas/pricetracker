@@ -682,7 +682,7 @@ export default function AurumTrackDashboard() {
           : 'bg-transparent border-none'
       }`}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-center">
-          {isAuthenticated ? <Logo iconSize={26} textSize="text-xl" /> : <div />}
+          <Logo iconSize={26} textSize="text-xl" />
         </div>
       </header>
 
@@ -695,7 +695,7 @@ export default function AurumTrackDashboard() {
             
             {/* Hero CTA */}
             <div className="text-center max-w-3xl mx-auto space-y-6 py-10 flex flex-col items-center">
-              <Logo textSize="text-6xl sm:text-7xl" className="flex justify-center mb-2 animate-scaleUp" />
+              <Logo iconSize={72} textSize="text-6xl sm:text-7xl" className="flex justify-center mb-2 animate-scaleUp" />
               <p className="text-zinc-600 text-sm sm:text-base max-w-xl mx-auto">
                 Stop managing physical precious metals in spreadsheets. Track inherited jewelry, record legacy bullion, and monitor growth against live spot rates on <span className="font-bold text-amber-500">aurumtrack</span>.
               </p>

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface LogoProps {
   className?: string;
@@ -6,12 +7,21 @@ interface LogoProps {
   textSize?: string;
 }
 
-export default function Logo({ className = '', textSize = 'text-2xl' }: LogoProps) {
+export default function Logo({ className = '', iconSize = 28, textSize = 'text-2xl' }: LogoProps) {
   return (
-    <div className={`select-none ${className}`}>
-      {/* Wordmark (Impact Font, all black, wide letter gaps) */}
-      <span 
-        style={{ 
+    <div className={`select-none flex items-center gap-2.5 ${className}`}>
+      {/* Logo mark */}
+      <Image
+        src="/logo.png"
+        alt="aurumtracker logo"
+        width={iconSize}
+        height={iconSize}
+        className="flex-shrink-0"
+        priority
+      />
+      {/* Wordmark */}
+      <span
+        style={{
           fontFamily: 'Impact, sans-serif',
           letterSpacing: '0.08em'
         }}
