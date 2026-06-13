@@ -87,8 +87,8 @@ export default function LivePriceCards({
   return (
     <div className="space-y-6">
       {/* Live Status and Indicator */}
-      <div className="flex items-center justify-between bg-zinc-900/50 backdrop-blur-md border border-zinc-800 rounded-xl px-4 py-3">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between bg-zinc-900/50 backdrop-blur-md border border-zinc-800 rounded-xl px-4 py-3">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="relative flex h-3.5 w-3.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>

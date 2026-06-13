@@ -61,13 +61,13 @@ export default function RegionalComparison({
 
   return (
     <div className="relative overflow-hidden rounded-2xl bg-zinc-900/40 border border-zinc-800 p-6 shadow-xl backdrop-blur-xl">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h3 className="text-xl font-bold text-white flex items-center gap-2">
           <Map className="text-indigo-500" size={20} />
           Regional Arbitrage Finder
         </h3>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
           {/* Metal Select */}
           <select
             value={metal}
