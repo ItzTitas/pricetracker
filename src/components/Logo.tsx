@@ -13,7 +13,7 @@ export default function Logo({ className = '', iconSize = 28, textSize = 'text-2
       {/* Logo mark */}
       <Image
         src="/applogo.jpg"
-        alt="aurumtracker logo"
+        alt="aurumcalculator logo"
         width={iconSize}
         height={iconSize}
         className="flex-shrink-0"
@@ -27,7 +27,7 @@ export default function Logo({ className = '', iconSize = 28, textSize = 'text-2
         }}
         className={`text-zinc-950 font-normal ${textSize}`}
       >
-        aurumtrack.
+        aurumcalculator.
       </span>
     </div>
   );

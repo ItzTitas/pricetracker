@@ -32,7 +32,7 @@ const PURITY_MULTIPLIERS: Record<string, number> = {
   '18K': 0.750
 };
 
-export default function AurumTrackDashboard() {
+export default function AurumCalculatorDashboard() {
   const { data: session, status } = useSession();
   const isAuthenticated = status === 'authenticated';
 
@@ -213,9 +213,9 @@ export default function AurumTrackDashboard() {
             }
 
             if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('aurumtrack Weekly Low Alert', { body: message });
+              new Notification('aurumcalculator Weekly Low Alert', { body: message });
             } else {
-              alert(`🚨 aurumtrack Alert: ${message}`);
+              alert(`🚨 aurumcalculator Alert: ${message}`);
             }
             localStorage.setItem(notifiedKey, 'true');
           }
@@ -735,7 +735,7 @@ export default function AurumTrackDashboard() {
             <div className="text-center max-w-3xl mx-auto space-y-6 py-10 flex flex-col items-center">
               <Logo iconSize={72} textSize="text-6xl sm:text-7xl" className="flex justify-center mb-2 animate-scaleUp" />
               <p className="text-zinc-600 text-sm sm:text-base max-w-xl mx-auto">
-                Stop managing physical precious metals in spreadsheets. Track inherited jewelry, record legacy bullion, and monitor growth against live spot rates on <span className="font-bold text-amber-500">aurumtrack</span>.
+                Stop managing physical precious metals in spreadsheets. Track inherited jewelry, record legacy bullion, and monitor growth against live spot rates on <span className="font-bold text-amber-500">aurumcalculator</span>.
               </p>
               
               <div className="pt-2 flex flex-col items-center gap-4">
@@ -1555,7 +1555,7 @@ export default function AurumTrackDashboard() {
                           />
                           <div className="space-y-0.5">
                             <h4 className="text-sm font-black text-zinc-900">{session?.user?.name || 'Titas Deb'}</h4>
-                            <p className="text-[10px] text-zinc-550 font-medium">{session?.user?.email || 'titas@aurumtrack.com'}</p>
+                            <p className="text-[10px] text-zinc-550 font-medium">{session?.user?.email || 'titas@aurumcalculator.com'}</p>
                           </div>
                         </div>
 
@@ -2307,7 +2307,7 @@ export default function AurumTrackDashboard() {
                     />
                     <div className="space-y-0.5">
                       <h4 className="text-sm font-black text-zinc-900">{session?.user?.name || 'Titas Deb'}</h4>
-                      <p className="text-[10px] text-zinc-500 font-medium">{session?.user?.email || 'titas@aurumtrack.com'}</p>
+                      <p className="text-[10px] text-zinc-500 font-medium">{session?.user?.email || 'titas@aurumcalculator.com'}</p>
                     </div>
                   </div>
 
@@ -2565,7 +2565,7 @@ export default function AurumTrackDashboard() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-zinc-200 py-8 text-center text-xs text-zinc-400 space-y-2">
-        <p>© 2026 aurumtrack portfolio intelligence platform. All rights reserved.</p>
+        <p>© 2026 aurumcalculator portfolio intelligence platform. All rights reserved.</p>
         <p>Market feeds delayed by 15m. Built with Next.js, React, Tailwind CSS, Recharts, and Prisma.</p>
       </footer>
     </div>

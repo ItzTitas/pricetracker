@@ -1,6 +1,6 @@
 {
-  "name": "aurumtracker.",
-  "short_name": "aurumtracker",
+  "name": "aurumcalculator.",
+  "short_name": "aurumcalculator",
   "description": "Real-time Gold & Silver portfolio intelligence.",
   "start_url": "/",
   "display": "standalone",

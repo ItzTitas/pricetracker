@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aurumcalculator.vercel.app'),
-  title: "aurumtracker.",
+  title: "aurumcalculator.",
   description: "Real-time commodities intelligence for Gold and Silver price tracking, investment return calculation, regional comparison, and advanced charting.",
   icons: {
     icon: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     shortcut: '/applogo.jpg',
   },
   openGraph: {
-    title: "aurumtracker.",
+    title: "aurumcalculator.",
     description: "Real-time Gold & Silver portfolio intelligence.",
     images: [{ url: '/applogo.jpg' }],
   },
@@ -38,6 +38,7 @@ export const metadata: Metadata = {
 };
 
 import AuthProvider from "@/components/AuthProvider";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({
   children,
@@ -59,6 +60,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
