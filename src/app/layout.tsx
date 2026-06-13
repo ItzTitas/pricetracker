@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://aurumcalculator.vercel.app'),
   title: "aurumtracker.",
   description: "Real-time commodities intelligence for Gold and Silver price tracking, investment return calculation, regional comparison, and advanced charting.",
   icons: {
