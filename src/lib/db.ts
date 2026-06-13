@@ -8,14 +8,18 @@ const isPostgres = !!pgUrl;
 // SQLite configuration for fallback
 const DB_FILE = path.join(process.cwd(), 'aurumtrack.db');
 
-// Initialize Prisma Client
-export const prisma = new PrismaClient({
+// Singleton Prisma Client (prevents connection pool exhaustion in Next.js dev hot-reload)
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   datasources: {
     db: {
       url: pgUrl || 'postgresql://mock:mock@localhost:5432/mock'
     }
   }
 });
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 // Helper for database compatibility
 export async function initDatabase() {
